@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Phoenix Nemo">
+    <meta name="description" content="MinoriWiki demo site">
+    <title>
+                NAT - MinoriWiki            </title>
+    <link href="/MinoriWiki/assets/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/MinoriWiki/assets/style.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+                <h1>NAT</h1>
+            </div>
+<div class="row">
+<!-- two columns -->
+<div class="col-lg-3 col-md-3">
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">About</h3>
+    </div>
+    <div class="panel-body">
+        <p>Author: <b>Phoenix Nemo</b></p>
+        <p>This is <a href="https://github.com/phoenixlzx/MinoriWiki" target="_blank">MinoriWiki</a> demo site, and a partial mirror of <a href="https://felixc.at" target="_blank">FelixWiki</a>.</p>
+    </div>
+</div>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">Navigation</h3>
+    </div>
+    <div class="panel-body">
+        <h4><a href="/MinoriWiki/">Homepage</a></h4>
+                <h5>Network Operation</h5>
+        <ul class="list-unstyled">
+                        <li><a href="/MinoriWiki/page/DoS">DoS</a></li>
+                    </ul>
+                <h5>Network Configuration</h5>
+        <ul class="list-unstyled">
+                        <li><a href="/MinoriWiki/page/NAT">NAT</a></li>
+                        <li><a href="/MinoriWiki/page/PortForwarding">PortForwarding</a></li>
+                    </ul>
+                <h5>Server Configuration</h5>
+        <ul class="list-unstyled">
+                        <li><a href="/MinoriWiki/page/Nginx">Nginx</a></li>
+                        <li><a href="/MinoriWiki/page/PHP">PHP</a></li>
+                    </ul>
+                <h5>Desktop Related</h5>
+        <ul class="list-unstyled">
+                        <li><a href="/MinoriWiki/page/Tmux">Tmux</a></li>
+                        <li><a href="/MinoriWiki/page/URxvt">URxvt</a></li>
+                    </ul>
+            </div>
+</div>
+</div>
+<div class="col-lg-9 col-md-9 col-sm-12">
+<div class="index-content">
+<div class="row">
+<span class="label label-primary pull-right">Network Configuration</span>
+</div>
+<div class="row">
+<h4 id="enable-ip-forwarding-first">Enable IP Forwarding First</h4>
+<pre><code>sed -i &#39;s/.*net\.ipv4\.ip_forward.*/net.ipv4.ip_forward = 1/&#39; /etc/sysctl.conf
+sysctl -p
+</code></pre><h4 id="nat-using-iptables">NAT using iptables</h4>
+<h5 id="recommended-way-if-ip-is-static-">Recommended Way (If IP is static)</h5>
+<pre><code>iptables -t nat -A POSTROUTING -s 10.0.0.0/8 -j SNAT --to-source &lt;IP&gt;
+</code></pre><h5 id="another-way-openvz-won-t-work-this-way-">Another Way (OpenVZ won’t work this way)</h5>
+<pre><code>iptables -t nat -A POSTROUTING -s 10.0.0.0/8 -j MASQUERADE
+</code></pre><p>Or if you want to MASQUERADE all interfaces:</p>
+<pre><code>iptables -t nat -A POSTROUTING ! -o lo -j MASQUERADE
+</code></pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+    <div class="footer-text">
+        <p>
+            MinoriWiki        </p>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Phoenix Nemo">
+    <meta name="description" content="MinoriWiki demo site">
+    <title>
+                Nginx - MinoriWiki            </title>
+    <link href="/MinoriWiki/assets/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/MinoriWiki/assets/style.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+                <h1>Nginx</h1>
+            </div>
+<div class="row">
+<!-- two columns -->
+<div class="col-lg-3 col-md-3">
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">About</h3>
+    </div>
+    <div class="panel-body">
+        <p>Author: <b>Phoenix Nemo</b></p>
+        <p>This is <a href="https://github.com/phoenixlzx/MinoriWiki" target="_blank">MinoriWiki</a> demo site, and a partial mirror of <a href="https://felixc.at" target="_blank">FelixWiki</a>.</p>
+    </div>
+</div>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">Navigation</h3>
+    </div>
+    <div class="panel-body">
+        <h4><a href="/MinoriWiki/">Homepage</a></h4>
+                <h5>Network Operation</h5>
+        <ul class="list-unstyled">
+                        <li><a href="/MinoriWiki/page/DoS">DoS</a></li>
+                    </ul>
+                <h5>Network Configuration</h5>
+        <ul class="list-unstyled">
+                        <li><a href="/MinoriWiki/page/NAT">NAT</a></li>
+                        <li><a href="/MinoriWiki/page/PortForwarding">PortForwarding</a></li>
+                    </ul>
+                <h5>Server Configuration</h5>
+        <ul class="list-unstyled">
+                        <li><a href="/MinoriWiki/page/Nginx">Nginx</a></li>
+                        <li><a href="/MinoriWiki/page/PHP">PHP</a></li>
+                    </ul>
+                <h5>Desktop Related</h5>
+        <ul class="list-unstyled">
+                        <li><a href="/MinoriWiki/page/Tmux">Tmux</a></li>
+                        <li><a href="/MinoriWiki/page/URxvt">URxvt</a></li>
+                    </ul>
+            </div>
+</div>
+</div>
+<div class="col-lg-9 col-md-9 col-sm-12">
+<div class="index-content">
+<div class="row">
+<span class="label label-primary pull-right">Server Configuration</span>
+</div>
+<div class="row">
+<h4 id="installation-on-ubuntu-server">Installation on Ubuntu Server</h4>
+<pre><code>apt-get install software-properties-common
+
+add-apt-repository ppa:nginx/stable
+
+apt-get update; apt-get install nginx -y
+</code></pre><h4 id="installation-on-debian-server">Installation on Debian Server</h4>
+<pre><code>wget http://www.dotdeb.org/dotdeb.gpg -O - | apt-key add -
+
+tee /etc/apt/sources.list.d/dotdeb.list &lt;&lt; EOF
+deb http://mirror.us.leaseweb.net/dotdeb/ wheezy all
+deb-src http://mirror.us.leaseweb.net/dotdeb/ wheezy all
+EOF
+
+apt-get update; apt-get install nginx -y
+</code></pre><h4 id="proxy">Proxy</h4>
+<pre><code>resolver 8.8.4.4;
+server {
+    listen 3128;
+    location / {
+        proxy_pass http://$http_host$request_uri;
+    }
+}
+</code></pre><h4 id="reverse-proxy">Reverse Proxy</h4>
+<pre><code>server {
+    listen 80;
+    server_name new-site.com;
+
+    location / {
+        proxy_pass http://origin-site.com/;
+        proxy_redirect default;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        port_in_redirect    on;
+        server_name_in_redirect off;
+        proxy_connect_timeout 300;
+    }
+}
+</code></pre><h4 id="cached-reverse-proxy">Cached Reverse Proxy</h4>
+<p>Make directories for cache:</p>
+<pre><code>mkdir -p /var/cache/nginx/cache
+mkdir -p /var/cache/nginx/temp
+</code></pre><p>Paste below <code>log_format</code> directive in <code>nginx.conf</code>:</p>
+<pre><code>client_body_buffer_size  512k;
+proxy_connect_timeout    5;
+proxy_read_timeout       60;
+proxy_send_timeout       5;
+proxy_buffer_size        16k;
+proxy_buffers            4 64k;
+proxy_busy_buffers_size 128k;
+proxy_temp_file_write_size 128k;
+proxy_temp_path   /var/cache/nginx/temp;
+proxy_cache_path  /var/cache/nginx/cache levels=1:2 keys_zone=cache_one:500m inactive=7d max_size=30g;
+</code></pre><p>Add to vhost configuration:</p>
+<pre><code>proxy_cache cache_one;
+proxy_cache_valid  200 304 3d;
+proxy_cache_key $host$uri$is_args$args;
+expires 10d;
+</code></pre><h4 id="set-expires-headers-for-static-content">Set Expires Headers For Static Content</h4>
+<pre><code>location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+    expires 1y;
+    log_not_found off;
+}
+</code></pre><h4 id="increase-http-post-size-limit">Increase HTTP Post Size Limit</h4>
+<pre><code>http {
+    #...
+    client_max_body_size 100m;
+    #...
+}
+</code></pre><h4 id="set-correct-files-folders-permissions">Set Correct Files/Folders Permissions</h4>
+<pre><code>chown -R www-data:www-data .
+find . -type f -exec chmod 644 {} \;
+find . -type d -exec chmod 755 {} \;
+</code></pre><p>References:</p>
+<ol>
+<li><a href="http://wiki.ptsang.net/Debian%E6%9C%8D%E5%8A%A1%E9%85%8D%E7%BD%AE">http://wiki.ptsang.net/Debian%E6%9C%8D%E5%8A%A1%E9%85%8D%E7%BD%AE</a></li>
+<li><a href="http://nicholaskuechler.com/2011/04/24/nginx-how-to-set-expires-headers-for-images/">http://nicholaskuechler.com/2011/04/24/nginx-how-to-set-expires-headers-for-images/</a></li>
+<li><a href="http://www.vpsmm.com/blog-2522.html">http://www.vpsmm.com/blog-2522.html</a></li>
+<li><a href="http://rtcamp.com/wordpress-nginx/tutorials/php/increase-file-upload-size-limit/">http://rtcamp.com/wordpress-nginx/tutorials/php/increase-file-upload-size-limit/</a></li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+    <div class="footer-text">
+        <p>
+            MinoriWiki        </p>
+    </div>
+</div>
+</body>
+</html>

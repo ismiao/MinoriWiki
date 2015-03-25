@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Phoenix Nemo">
+    <meta name="description" content="MinoriWiki demo site">
+    <title>
+                Tmux - MinoriWiki            </title>
+    <link href="/MinoriWiki/assets/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/MinoriWiki/assets/style.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+                <h1>Tmux</h1>
+            </div>
+<div class="row">
+<!-- two columns -->
+<div class="col-lg-3 col-md-3">
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">About</h3>
+    </div>
+    <div class="panel-body">
+        <p>Author: <b>Phoenix Nemo</b></p>
+        <p>This is <a href="https://github.com/phoenixlzx/MinoriWiki" target="_blank">MinoriWiki</a> demo site, and a partial mirror of <a href="https://felixc.at" target="_blank">FelixWiki</a>.</p>
+    </div>
+</div>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">Navigation</h3>
+    </div>
+    <div class="panel-body">
+        <h4><a href="/MinoriWiki/">Homepage</a></h4>
+                <h5>Network Operation</h5>
+        <ul class="list-unstyled">
+                        <li><a href="/MinoriWiki/page/DoS">DoS</a></li>
+                    </ul>
+                <h5>Network Configuration</h5>
+        <ul class="list-unstyled">
+                        <li><a href="/MinoriWiki/page/NAT">NAT</a></li>
+                        <li><a href="/MinoriWiki/page/PortForwarding">PortForwarding</a></li>
+                    </ul>
+                <h5>Server Configuration</h5>
+        <ul class="list-unstyled">
+                        <li><a href="/MinoriWiki/page/Nginx">Nginx</a></li>
+                        <li><a href="/MinoriWiki/page/PHP">PHP</a></li>
+                    </ul>
+                <h5>Desktop Related</h5>
+        <ul class="list-unstyled">
+                        <li><a href="/MinoriWiki/page/Tmux">Tmux</a></li>
+                        <li><a href="/MinoriWiki/page/URxvt">URxvt</a></li>
+                    </ul>
+            </div>
+</div>
+</div>
+<div class="col-lg-9 col-md-9 col-sm-12">
+<div class="index-content">
+<div class="row">
+<span class="label label-primary pull-right">Desktop Related</span>
+</div>
+<div class="row">
+<h4 id="my-configuration">My Configuration</h4>
+<pre><code>set -g prefix ^a
+unbind ^b
+bind a send-prefix
+unbind &#39;&quot;&#39;
+bind - splitw -v # horizontal split
+unbind %
+bind | splitw -h # vertical split
+bind k selectp -U # select upper pane
+bind j selectp -D # select lower pane
+bind h selectp -L # select left pane
+bind l selectp -R # select right pane
+bind ^k resizep -U 10
+bind ^j resizep -D 10
+bind ^h resizep -L 10
+bind ^l resizep -R 10
+bind ^u swapp -U # swap with upper pane
+bind ^d swapp -D # swap with lower pane
+
+set -g status-right &quot;#[fg=green]#(date)#[default] • #[fg=green]#(cut -d &#39; &#39; -f 1-3 /proc/loadavg)#[default]&quot;
+set -g status-bg black
+set -g status-fg yellow
+setw -g mode-keys vi
+setw -g mode-mouse off
+set -g terminal-overrides &#39;xterm*:smcup@:rmcup@&#39;
+set -g base-index 1
+#set -s escape-time 0
+setw -g aggressive-resize on
+
+unbind r
+bind r source-file ~/.tmux.conf
+
+set -g history-limit 25000
+
+#T-Mobile G2 workarounds
+bind Q send-keys F1
+bind W send-keys F2
+bind E send-keys F3
+bind R send-keys F4
+bind T send-keys F5
+bind Y send-keys F6
+bind U send-keys F7
+bind I send-keys F8
+bind O send-keys F9
+bind P send-keys F10
+bind A send-keys F11
+bind S send-keys F12
+
+bind / send-keys |
+
+unbind t
+bind t send-keys Tab
+
+unbind N
+bind N clock-mode
+
+unbind @
+bind @ send-keys Escape
+
+unbind H
+bind H send-keys Home
+
+unbind L
+bind L send-keys End
+
+unbind J
+bind J send-keys PageDown
+
+unbind K
+bind K send-keys PageUp
+
+#Alt-n window switching
+unbind M-1
+unbind M-2
+unbind M-3
+unbind M-4
+unbind M-5
+unbind M-6
+unbind M-7
+unbind M-8
+unbind M-9
+bind-key -n M-1 select-window -t :1
+bind-key -n M-2 select-window -t :2
+bind-key -n M-3 select-window -t :3
+bind-key -n M-4 select-window -t :4
+bind-key -n M-5 select-window -t :5
+bind-key -n M-6 select-window -t :6
+bind-key -n M-7 select-window -t :7
+bind-key -n M-8 select-window -t :8
+bind-key -n M-9 select-window -t :9
+
+bind-key -n ^PageDown next-window
+bind-key -n ^PageUp previous-window
+
+#set -g default-terminal &quot;screen-256color&quot;
+#For compatibility
+set -g default-terminal &quot;xterm-color&quot;
+
+##CLIPBOARD selection integration
+##Requires prefix key before the command key
+#Copy tmux paste buffer to CLIPBOARD
+bind C-c run -b &quot;tmux show-buffer | xclip -i -selection clipboard&quot;
+#Copy CLIPBOARD to tmux paste buffer and paste tmux paste buffer
+bind C-v run &quot;tmux set-buffer \&quot;$(xclip -o -selection clipboard)\&quot;; tmux paste-buffer&quot;
+</code></pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+    <div class="footer-text">
+        <p>
+            MinoriWiki        </p>
+    </div>
+</div>
+</body>
+</html>
