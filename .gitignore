@@ -1,5 +1,5 @@
-.DS_Store
-.idea
+.*
+!/.gitignore
 test
 node_modules
 
